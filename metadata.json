@@ -1,0 +1,6 @@
+{
+  "name": "Smallpdf",
+  "description": "All-in-one PDF toolkit to merge, split, compress, edit, watermark delete, and OCR scan documents.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
