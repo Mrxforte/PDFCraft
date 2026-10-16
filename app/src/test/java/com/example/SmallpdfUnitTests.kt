@@ -65,7 +65,32 @@ class SmallpdfUnitTests {
         assertTrue(popular.contains(PdfToolType.MERGE))
         assertTrue(popular.contains(PdfToolType.COMPRESS))
         assertTrue(popular.contains(PdfToolType.WATERMARK_DELETE))
+        assertTrue(popular.contains(PdfToolType.DELETE_METADATA))
         assertTrue(popular.contains(PdfToolType.OCR))
         assertTrue(popular.contains(PdfToolType.SPLIT))
+    }
+
+    @Test
+    fun testPdfSearchResultModel() {
+        val pageMatch = com.example.core.pdf.PdfPageMatch(
+            pageIndex = 0,
+            snippets = listOf("...Invoice total is $150..."),
+            count = 1
+        )
+        val result = com.example.core.pdf.PdfSearchResult(
+            query = "Invoice",
+            matches = listOf(pageMatch),
+            totalOccurrences = 1
+        )
+        assertEquals("Invoice", result.query)
+        assertEquals(1, result.totalOccurrences)
+        assertEquals(0, result.matches[0].pageIndex)
+    }
+
+    @Test
+    fun testPdfBookmarkModel() {
+        val bm = com.example.core.pdf.PdfBookmark(title = "Chapter 1: Overview", pageIndex = 3)
+        assertEquals("Chapter 1: Overview", bm.title)
+        assertEquals(3, bm.pageIndex)
     }
 }

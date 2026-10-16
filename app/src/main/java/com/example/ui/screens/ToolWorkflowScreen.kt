@@ -62,6 +62,12 @@ fun ToolWorkflowScreen(
     var recipientEmail by remember { mutableStateOf("") }
     var signatureSubject by remember { mutableStateOf("Please sign this document") }
 
+    // Annotation and Edit state
+    var annotationText by remember { mutableStateOf("APPROVED") }
+    var annotationColorHex by remember { mutableStateOf(0xFF0B57F9) }
+    var targetAnnotationPage by remember { mutableStateOf(0) }
+    var annotationYPercent by remember { mutableStateOf(0.15f) }
+
     // Multi-image picker for Image to PDF
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
@@ -319,6 +325,63 @@ fun ToolWorkflowScreen(
                             }
                         }
 
+                        PdfToolType.ANNOTATE, PdfToolType.EDIT -> {
+                            item {
+                                Card(
+                                    shape = RoundedCornerShape(14.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    border = BorderStroke(1.dp, SmallpdfBorder),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(modifier = Modifier.padding(16.dp)) {
+                                        Text(
+                                            if (tool == PdfToolType.ANNOTATE) "Text Note / Callout Annotation" else "Add Text Overlay",
+                                            fontWeight = FontWeight.Bold,
+                                            color = SmallpdfNavy
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        OutlinedTextField(
+                                            value = annotationText,
+                                            onValueChange = { annotationText = it },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(10.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                            listOf("APPROVED", "CONFIDENTIAL", "REVIEWED", "URGENT").forEach { tag ->
+                                                AssistChip(
+                                                    onClick = { annotationText = tag },
+                                                    label = { Text(tag) }
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Text("Target Page:", fontSize = 13.sp, color = SmallpdfTextSecondary)
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        val maxP = selectedFiles.firstOrNull()?.pageCount ?: 1
+                                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                            for (p in 0 until maxP.coerceAtMost(5)) {
+                                                FilterChip(
+                                                    selected = targetAnnotationPage == p,
+                                                    onClick = { targetAnnotationPage = p },
+                                                    label = { Text("P${p + 1}") }
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                        Text("Vertical Position on Page: ${(annotationYPercent * 100).toInt()}%", fontSize = 12.sp, color = SmallpdfTextSecondary)
+                                        Slider(
+                                            value = annotationYPercent,
+                                            onValueChange = { annotationYPercent = it },
+                                            valueRange = 0.05f..0.90f
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         else -> Unit
                     }
 
@@ -420,6 +483,17 @@ Verification Code: SP-${(100000..999999).random()}"""
                                                 originalSizeBytes = firstFile.length(),
                                                 outputSizeBytes = auditFile.length(),
                                                 message = "Signature request envelope prepared for $recipientEmail!"
+                                            )
+                                        }
+                                        PdfToolType.ANNOTATE, PdfToolType.EDIT -> {
+                                            currentStep = "Applying text annotation and overlay to page ${targetAnnotationPage + 1}..."
+                                            PdfAdvancedEngine.addAnnotationToPdf(
+                                                context = context,
+                                                inputFile = firstFile,
+                                                targetPageIndex = targetAnnotationPage,
+                                                noteText = annotationText,
+                                                noteColorHex = annotationColorHex,
+                                                yPercent = annotationYPercent
                                             )
                                         }
                                         else -> {

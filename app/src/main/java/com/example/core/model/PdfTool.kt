@@ -41,6 +41,14 @@ enum class PdfToolType(
         isPopular = true,
         badge = "New"
     ),
+    DELETE_METADATA(
+        title = "Delete EXIF & Author",
+        description = "Strip author, creator, GPS location, device tags, and EXIF metadata from PDFs and photos.",
+        iconColor = ToolWatermarkDelete,
+        category = ToolCategory.SECURITY,
+        isPopular = true,
+        badge = "Privacy"
+    ),
     OCR(
         title = "PDF OCR",
         description = "Reliable scanner converting document images into editable Word & text.",

@@ -95,6 +95,9 @@ class MainActivity : ComponentActivity() {
                                         currentScreen = ScreenDestination.Viewer(f)
                                     }
                                 },
+                                onOpenPdf = { file ->
+                                    currentScreen = ScreenDestination.Viewer(file)
+                                },
                                 recentHistory = recentHistory,
                                 modifier = screenModifier
                             )
@@ -144,6 +147,13 @@ class MainActivity : ComponentActivity() {
                                 }
                                 PdfToolType.WATERMARK_DELETE -> {
                                     WatermarkDeleterScreen(
+                                        onNavigateBack = { currentScreen = ScreenDestination.Home },
+                                        onViewPdf = { file -> currentScreen = ScreenDestination.Viewer(file) },
+                                        modifier = screenModifier
+                                    )
+                                }
+                                PdfToolType.DELETE_METADATA -> {
+                                    MetadataCleanerScreen(
                                         onNavigateBack = { currentScreen = ScreenDestination.Home },
                                         onViewPdf = { file -> currentScreen = ScreenDestination.Viewer(file) },
                                         modifier = screenModifier

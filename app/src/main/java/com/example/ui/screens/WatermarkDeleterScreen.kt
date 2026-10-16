@@ -56,6 +56,7 @@ fun WatermarkDeleterScreen(
     // Custom slider values
     var customTop by remember { mutableStateOf(0.90f) }
     var customBottom by remember { mutableStateOf(1.0f) }
+    var stripAuthorAndExif by remember { mutableStateOf(true) }
 
     var isProcessing by remember { mutableStateOf(false) }
     var currentStep by remember { mutableStateOf("Preparing document...") }

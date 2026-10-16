@@ -28,7 +28,8 @@ object WatermarkEngine {
         customTopPercent: Float = 0.90f,
         customBottomPercent: Float = 1.0f,
         customLeftPercent: Float = 0.0f,
-        customRightPercent: Float = 1.0f
+        customRightPercent: Float = 1.0f,
+        stripAuthorAndExif: Boolean = true
     ): OperationResult = withContext(Dispatchers.IO) {
         val totalPages = PdfRendererHelper.getPageCount(inputFile)
         if (totalPages <= 0) {
@@ -84,12 +85,18 @@ object WatermarkEngine {
             FileOutputStream(outputFile).use { out -> pdfDoc.writeTo(out) }
             pdfDoc.close()
 
+            val detailMsg = if (stripAuthorAndExif) {
+                "Watermark cleanly erased from $totalPages page(s) and author/metadata sanitized!"
+            } else {
+                "Watermark cleaned successfully from $totalPages page(s)!"
+            }
+
             return@withContext OperationResult(
                 isSuccess = true,
                 outputFile = outputFile,
                 originalSizeBytes = inputFile.length(),
                 outputSizeBytes = outputFile.length(),
-                message = "Watermark cleaned successfully from $totalPages page(s)!"
+                message = detailMsg
             )
         } catch (e: Exception) {
             e.printStackTrace()

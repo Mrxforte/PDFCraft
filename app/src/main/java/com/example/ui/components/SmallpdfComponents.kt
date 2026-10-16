@@ -219,11 +219,93 @@ fun PdfToolCard(
     }
 }
 
+@Composable
+fun PdfToolGridTile(
+    tool: PdfToolType,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag("tool_grid_${tool.name.lowercase()}"),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, SmallpdfBorder),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(vertical = 12.dp, horizontal = 6.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(46.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(tool.iconColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = getToolIcon(tool),
+                    contentDescription = tool.title,
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = tool.title,
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.5.sp,
+                    color = SmallpdfTextPrimary,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            tool.badge?.let { badgeText ->
+                Spacer(modifier = Modifier.height(4.dp))
+                Surface(
+                    color = when (badgeText) {
+                        "PRO" -> Color(0xFFFEF08A)
+                        "New" -> Color(0xFFDCFCE7)
+                        "Privacy" -> Color(0xFFCCFBF1)
+                        else -> SmallpdfInfoBg
+                    },
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(
+                        text = badgeText,
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.5.dp),
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = when (badgeText) {
+                            "PRO" -> Color(0xFF854D0E)
+                            "New" -> Color(0xFF166534)
+                            "Privacy" -> Color(0xFF0F766E)
+                            else -> SmallpdfPrimary
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+
 fun getToolIcon(tool: PdfToolType): ImageVector {
     return when (tool) {
         PdfToolType.MERGE -> Icons.Filled.CallMerge
         PdfToolType.COMPRESS -> Icons.Filled.Compress
         PdfToolType.WATERMARK_DELETE -> Icons.Filled.AutoFixHigh
+        PdfToolType.DELETE_METADATA -> Icons.Filled.PrivacyTip
         PdfToolType.OCR -> Icons.Filled.DocumentScanner
         PdfToolType.SPLIT -> Icons.Filled.CallSplit
         PdfToolType.ANNOTATE -> Icons.Filled.Draw
